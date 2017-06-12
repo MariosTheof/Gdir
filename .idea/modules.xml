@@ -4,6 +4,11 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Gdir.iml" filepath="$PROJECT_DIR$/Gdir.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/master/master.iml" filepath="$PROJECT_DIR$/master/master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/reducer/reducer.iml" filepath="$PROJECT_DIR$/reducer/reducer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/worker1/worker1.iml" filepath="$PROJECT_DIR$/worker1/worker1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/worker2/worker2.iml" filepath="$PROJECT_DIR$/worker2/worker2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/worker3/worker3.iml" filepath="$PROJECT_DIR$/worker3/worker3.iml" />
     </modules>
   </component>
 </project>
