@@ -8,10 +8,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.support.v4.app.Fragment;
+
+
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+
+
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -19,7 +24,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-//GoogleMap mMap;
+
 
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback{
     public static Double beginningInputVar1;
@@ -28,23 +33,22 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     Double beginningInputVar2 , destinationInputVar1, destinationInputVar2;
 
     //client-similar vars
-    static final String MasterIP = "http://10.0.2.2:8080/"; //CHANGE THIS ACCORDINGLY
+    static final String MasterIP = "192.168.1.3"; //CHANGE THIS ACCORDINGLY
     static final int MasterPort = 4320;
     static Socket clientToMasterSocket = null;
     static ObjectOutputStream outToMaster = null;
     static ObjectInputStream inFromMaster = null;
     static Query q = null;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
-//        mapFragment.getMapAsync(this);
+        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
-        //mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap(); // way to instantiate GoogleMap object.
+
 
 
         beginningInput = (EditText)findViewById(R.id.etStart); // first EditText
@@ -91,6 +95,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         //DO WHATEVER YOU WANT WITH GOOGLEMAP
         map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 //        map.setMyLocationEnabled(true);
+//        LatLng sydney = new LatLng(-34, 151);
+//        map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        map.setPadding(0, 220, 0, 0);
+
         map.setTrafficEnabled(true);
         map.setIndoorEnabled(true);
         map.setBuildingsEnabled(true);
@@ -154,10 +162,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private static void showResults(Routes r){
-//        Log.v("Direction",)
-//       Try to swtich to Log.v after.'
-        Log.v("Reach","Hello I reached getResults()");
 
-        System.out.println(r.direction.direction);
+        Log.v("Reach","Hello I reached showResults()");
+
+//        System.out.println(r.direction.direction);
+        Log.v("HEART OF GOLD", r.direction.direction);
     }
 }
