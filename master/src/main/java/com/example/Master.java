@@ -7,7 +7,6 @@ import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-
 public class Master{
     Integer port;
     static final String WORKER1IP = "127.0.0.1";//CHANGE THIS ACCORDINGLY

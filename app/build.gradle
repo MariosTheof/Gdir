@@ -31,4 +31,5 @@ dependencies {
     compile 'com.google.android.gms:play-services:10.2.4'
     compile 'com.android.support:multidex:1.0.1'
     testCompile 'junit:junit:4.12'
+    compile project(path: ':sharedclasses')
 }

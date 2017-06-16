@@ -3,6 +3,7 @@ apply plugin: 'java'
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile files('libs/resty-0.3.2.jar')
+    compile project(path: ':sharedclasses')
 }
 
 sourceCompatibility = "1.7"

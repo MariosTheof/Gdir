@@ -1,10 +1,10 @@
-package com.example.athma_000.gdir;
+package com.example;
 
 import java.io.Serializable;
 public class Routes implements Serializable{
 	Point start;
 	Point destination;
-	Directions direction;
+	public Directions direction;
 	Routes(Point a, Point b, Directions d){
 		start = a;
 		destination = b;

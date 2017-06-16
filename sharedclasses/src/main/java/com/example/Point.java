@@ -1,9 +1,9 @@
-package com.example.athma_000.gdir;
+package com.example;
 
 import java.io.Serializable;
 public class Point implements Serializable{
 	double Lat, Long;
-	Point(double Latitude, double Longitude){
+	public Point(double Latitude, double Longitude){
 		this.Lat = Latitude;
 		this.Long = Longitude;
 	}

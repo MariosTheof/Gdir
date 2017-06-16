@@ -11,6 +11,7 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/master" />
             <option value="$PROJECT_DIR$/reducer" />
+            <option value="$PROJECT_DIR$/sharedclasses" />
             <option value="$PROJECT_DIR$/worker1" />
             <option value="$PROJECT_DIR$/worker2" />
             <option value="$PROJECT_DIR$/worker3" />

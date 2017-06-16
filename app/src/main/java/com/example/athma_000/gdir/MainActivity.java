@@ -1,5 +1,6 @@
 package com.example.athma_000.gdir;
 
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -11,26 +12,35 @@ import android.widget.ImageButton;
 import android.support.v4.app.Fragment;
 
 
-
+import com.example.Point;
+import com.example.Query;
+import com.example.Routes;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 
-
-public class MainActivity extends FragmentActivity implements OnMapReadyCallback{
+public class MainActivity extends FragmentActivity implements OnMapReadyCallback {
     public static Double beginningInputVar1;
     ImageButton magnifierButton;
     EditText beginningInput, destinationInput;
-    Double beginningInputVar2 , destinationInputVar1, destinationInputVar2;
+    Double beginningInputVar2, destinationInputVar1, destinationInputVar2;
+    GoogleMap map;
 
     //client-similar vars
     static final String MasterIP = "192.168.1.3"; //CHANGE THIS ACCORDINGLY
@@ -49,18 +59,14 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
 
+        beginningInput = (EditText) findViewById(R.id.etStart); // first EditText
+        destinationInput = (EditText) findViewById(R.id.etDestination); // last EditText
 
-
-        beginningInput = (EditText)findViewById(R.id.etStart); // first EditText
-        destinationInput = (EditText)findViewById(R.id.etDestination); // last EditText
-
-        magnifierButton = (ImageButton)findViewById(R.id.buttonGo); // magnifier button
+        magnifierButton = (ImageButton) findViewById(R.id.buttonGo); // magnifier button
 
         magnifierButton.setOnClickListener(
-                new View.OnClickListener()
-                {
-                    public void onClick(View view)
-                    {
+                new View.OnClickListener() {
+                    public void onClick(View view) {
                         Log.v("EditText", beginningInput.getText().toString());
                         Log.v("EditText", destinationInput.getText().toString());
 
@@ -81,18 +87,25 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                         Log.v("destDouble1", destinationInputVar1.toString());
                         Log.v("destDouble2", destinationInputVar2.toString());
 
-                        Point startPoint = new Point(beginningInputVar1 ,beginningInputVar2);
-                        Point destinationPoint = new Point(destinationInputVar1 ,destinationInputVar2);
+                        Point startPoint = new Point(beginningInputVar1, beginningInputVar2);
+                        Point destinationPoint = new Point(destinationInputVar1, destinationInputVar2);
 
                         q = createQuery(startPoint, destinationPoint);
                         new initialize().execute();
+
                     }
                 });
     }
 
     @Override
-    public void onMapReady(GoogleMap map) {
+    public void onMapReady(GoogleMap retMap) {
         //DO WHATEVER YOU WANT WITH GOOGLEMAP
+        map = retMap;
+
+        setUpMap();
+    }
+
+    private void setUpMap() {
         map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 //        map.setMyLocationEnabled(true);
 //        LatLng sydney = new LatLng(-34, 151);
@@ -103,15 +116,16 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         map.setIndoorEnabled(true);
         map.setBuildingsEnabled(true);
         map.getUiSettings().setZoomControlsEnabled(true);
+
     }
 
-    private static Query createQuery(Point a, Point b){
-        Query query = new Query(a,b);
+    private static Query createQuery(Point a, Point b) {
+        Query query = new Query(a, b);
         return query;
     }
 
-    private static void sendQueryToServer(Query q){
-        try{
+    private static void sendQueryToServer(Query q) {
+        try {
             outToMaster = new ObjectOutputStream(clientToMasterSocket.getOutputStream());
             outToMaster.writeObject(q);
             outToMaster.flush();
@@ -140,7 +154,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
             } catch (UnknownHostException unknownHost) {
                 System.err.println("You are trying to connect to an unknown host!");
-            } catch(IOException ioException) {
+            } catch (IOException ioException) {
                 ioException.printStackTrace();
             }
             return null;
@@ -148,7 +162,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    private static Routes getResults(){
+    private static Routes getResults() {
         Routes r = null;
         try {
             inFromMaster = new ObjectInputStream(clientToMasterSocket.getInputStream());
@@ -161,11 +175,77 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         return r;
     }
 
-    private static void showResults(Routes r){
+    private void showResults(Routes r) {
 
-        Log.v("Reach","Hello I reached showResults()");
+        Log.v("Reach", "Hello I reached showResults()");
 
 //        System.out.println(r.direction.direction);
         Log.v("HEART OF GOLD", r.direction.direction);
+
+        ParserTask parserTask = new ParserTask();
+        parserTask.execute(r.direction.direction);
+    }
+
+    /**
+     * A class to parse the Google Places in JSON format
+     */
+    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
+
+        // Parsing the data in non-ui thread
+        @Override
+        protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
+
+            JSONObject jObject;
+            List<List<HashMap<String, String>>> routes = null;
+
+            try {
+                jObject = new JSONObject(jsonData[0]);
+                DirectionsParser parser = new DirectionsParser();
+
+                // Starts parsing data
+                routes = parser.parse(jObject);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return routes;
+        }
+
+        // Executes in UI thread, after the parsing process
+        @Override
+        protected void onPostExecute(List<List<HashMap<String, String>>> result) {
+            ArrayList<LatLng> points = null;
+            PolylineOptions lineOptions = null;
+//            MarkerOptions markerOptions = new MarkerOptions();
+
+            // Traversing through all the routes
+            for (int i = 0; i < result.size(); i++) {
+                points = new ArrayList<LatLng>();
+                lineOptions = new PolylineOptions();
+
+                // Fetching i-th route
+                List<HashMap<String, String>> path = result.get(i);
+
+                // Fetching all the points in i-th route
+                for (int j = 0; j < path.size(); j++) {
+                    HashMap<String, String> point = path.get(j);
+
+                    double lat = Double.parseDouble(point.get("lat"));
+                    double lng = Double.parseDouble(point.get("lng"));
+                    LatLng position = new LatLng(lat, lng);
+
+                    points.add(position);
+                }
+
+                // Adding all the points in the route to LineOptions
+                lineOptions.addAll(points);
+                lineOptions.width(2);
+                lineOptions.color(Color.RED);
+            }
+
+            // Drawing polyline in the Google Map for the i-th route
+            map.addPolyline(lineOptions);
+
+
+        }
     }
 }

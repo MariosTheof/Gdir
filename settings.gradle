@@ -1,1 +1,1 @@
-include ':app', ':master', ':reducer', ':worker1', ':worker2', ':worker3'
+include ':app', ':master', ':reducer', ':worker1', ':worker2', ':worker3', ':sharedclasses'
