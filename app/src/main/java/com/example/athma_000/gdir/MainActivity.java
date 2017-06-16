@@ -15,6 +15,7 @@ import android.support.v4.app.Fragment;
 import com.example.Point;
 import com.example.Query;
 import com.example.Routes;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -90,6 +91,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                         Point startPoint = new Point(beginningInputVar1, beginningInputVar2);
                         Point destinationPoint = new Point(destinationInputVar1, destinationInputVar2);
 
+                        // Move the camera instantly to our location
+                        LatLng zoomLocation = new LatLng(beginningInputVar1, beginningInputVar2);
+                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(zoomLocation, 12));
+
                         q = createQuery(startPoint, destinationPoint);
                         new initialize().execute();
 
@@ -106,15 +111,13 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void setUpMap() {
-        map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 //        map.setMyLocationEnabled(true);
 //        LatLng sydney = new LatLng(-34, 151);
 //        map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         map.setPadding(0, 220, 0, 0);
 
-        map.setTrafficEnabled(true);
-        map.setIndoorEnabled(true);
-        map.setBuildingsEnabled(true);
+
         map.getUiSettings().setZoomControlsEnabled(true);
 
     }
