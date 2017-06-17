@@ -43,7 +43,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     Double beginningInputVar2, destinationInputVar1, destinationInputVar2;
     GoogleMap map;
 
-    //client-similar vars
+    /*client-similar variables*/
     static final String MasterIP = "192.168.1.3"; //CHANGE THIS ACCORDINGLY
     static final int MasterPort = 4320;
     static Socket clientToMasterSocket = null;
@@ -56,6 +56,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        /*put  google map instance in the google map*/
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
@@ -65,6 +66,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         magnifierButton = (ImageButton) findViewById(R.id.buttonGo); // magnifier button
 
+        /*what happens when you click on the (magnifier) button*/
         magnifierButton.setOnClickListener(
                 new View.OnClickListener() {
                     public void onClick(View view) {
@@ -102,31 +104,24 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 });
     }
 
+    /*Methods to tweak the map*/
     @Override
     public void onMapReady(GoogleMap retMap) {
-        //DO WHATEVER YOU WANT WITH GOOGLEMAP
         map = retMap;
-
         setUpMap();
     }
-
     private void setUpMap() {
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-//        map.setMyLocationEnabled(true);
-//        LatLng sydney = new LatLng(-34, 151);
-//        map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         map.setPadding(0, 220, 0, 0);
-
-
         map.getUiSettings().setZoomControlsEnabled(true);
-
     }
-
+    
+    /*Creates a query object*/
     private static Query createQuery(Point a, Point b) {
         Query query = new Query(a, b);
         return query;
     }
-
+    /*Sends a query to the Server(master) to process*/
     private static void sendQueryToServer(Query q) {
         try {
             outToMaster = new ObjectOutputStream(clientToMasterSocket.getOutputStream());
@@ -136,7 +131,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             ioException.printStackTrace();
         }
     }
-
+    /*Asychronously opens a socket with the server(master),sends a query in and receives one back.*/
     public class initialize extends AsyncTask {
 
         @Override
@@ -154,7 +149,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 outToMaster.close();
                 inFromMaster.close();
                 clientToMasterSocket.close();
-
+                
             } catch (UnknownHostException unknownHost) {
                 System.err.println("You are trying to connect to an unknown host!");
             } catch (IOException ioException) {
@@ -164,7 +159,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-
+    /*Receives results(routes) from the server(master)*/
     private static Routes getResults() {
         Routes r = null;
         try {
@@ -180,12 +175,12 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void showResults(Routes r) {
 
-        Log.v("Reach", "Hello I reached showResults()");
+        //Log.v("Reach", "Hello I reached showResults()");
 
-//        System.out.println(r.direction.direction);
+        //System.out.println(r.direction.direction);
         Log.v("HEART OF GOLD", r.direction.direction);
 
-        ParserTask parserTask = new ParserTask();
+        ParserTask parserTask = new ParserTask(); // creates a ParserTask that will parse the json file
         parserTask.execute(r.direction.direction);
     }
 
